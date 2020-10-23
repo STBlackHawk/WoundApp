@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 
 def detect():
-		p = subprocess.Popen(['python', 'yolov5/detect.py', '--weights',\
+		p = subprocess.Popen(['python3', 'yolov5/detect.py', '--weights',\
 			'best2.pt', '--conf', '0.1', '--source','test1.jpeg'])
 		p.communicate()
 
@@ -41,12 +41,14 @@ def upload():
 
 
         #do the type checking here
-        im.save(infile.filename)
+        im_rgb = np.array(im)[:, :, [2, 1, 0]]
+        Image.fromarray(im_rgb).save('test1.jpeg')
+        #im.save('test1.jpeg')
 
         #run the deteciton
         t = detect()
         if t=='Saved':
-        	im = Image.open('inference/output/'+infile.filename)
+        	im = Image.open('inference/output/test1.jpeg')
 
         #read the results
         
