@@ -35,60 +35,65 @@ def upload():
 
         # process data
         infile = request.files['file']
-        print('This is the file name'+infile.filename)
-        im = Image.open(io.BytesIO(infile.stream.read()))
-        im = im.resize([600, 600])
+        print(str(infile.filename))
+        print(infile.filename.rsplit('.'))
+        if str(infile.filename).rsplit('.')[1].lower() in ['jpeg', 'jpg']:
+            print('This is the file name'+infile.filename)
+            im = Image.open(io.BytesIO(infile.stream.read()))
+            im = im.resize([600, 600])
 
 
-        #do the type checking here
-        im_rgb = np.array(im)[:, :, [2, 1, 0]]
-        Image.fromarray(im_rgb).save('test1.jpeg')
-        #im.save('test1.jpeg')
+            im_rgb = np.array(im)[:, :, [2, 1, 0]]
+            Image.fromarray(im_rgb).save('test1.jpeg')
+            #im.save('test1.jpeg')
 
-        #run the deteciton
-        t = detect()
-        if t=='Saved':
-        	im = Image.open('inference/output/test1.jpeg')
+            #run the deteciton
+            t = detect()
+            if t=='Saved':
+                im = Image.open('inference/output/test1.jpeg')
 
-        #read the results
-        
-
+            #read the results
     
-        H, W = im.size[0], im.size[1]
-        X = np.array(
-            im.getdata()).reshape(
-            W, H, 3).astype(np.uint8)
+            H, W = im.size[0], im.size[1]
+            X = np.array(
+                im.getdata()).reshape(
+                W, H, 3).astype(np.uint8)
         
-        print(X.shape)
+            print(X.shape)
 
-        W = X.shape[0]
-        H = X.shape[1]
+            W = X.shape[0]
+            H = X.shape[1]
 
-        img = np.empty((W, H), dtype=np.uint32)
-        view = img.view(dtype=np.uint8).reshape((W, H, 4))
+            img = np.empty((W, H), dtype=np.uint32)
+            view = img.view(dtype=np.uint8).reshape((W, H, 4))
 
-        view[:, :, :3] = X[::-1, :, ::-1]
-        view[:, :, 3] = 255
+            view[:, :, :3] = X[::-1, :, ::-1]
+            view[:, :, 3] = 255
 
-        p = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")])
-        p.x_range.range_padding = p.y_range.range_padding = 0
+            p = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")])
+            p.x_range.range_padding = p.y_range.range_padding = 0
 
-        # must give a vector of images
-        p.image_rgba(image=[img], x=0, y=0, dw=10, dh=10)
+            # must give a vector of images
+            p.image_rgba(image=[img], x=0, y=0, dw=10, dh=10)
 
-        # grab the static resources
-        js_resources = INLINE.render_js()
-        css_resources = INLINE.render_css()
+            # grab the static resources
+            js_resources = INLINE.render_js()
+            css_resources = INLINE.render_css()
 
-        # render template
-        script, div = components(p)
-        html = render_template(
-            'bokeh.html',
-            plot_script=script,
-            plot_div=div,
-            js_resources=js_resources,
-            css_resources=css_resources,
-        )
+            # render template
+            script, div = components(p)
+            html = render_template(
+                'bokeh.html',
+                plot_script=script,
+                plot_div=div,
+                js_resources=js_resources,
+                css_resources=css_resources,
+            )
+        else:
+            print("non jpeg passed")
+            html = render_template(
+                    'error.html'
+                    )
         return html
             
     else: 
