@@ -12,13 +12,16 @@ from PIL import Image
 import subprocess
 
 
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+
 
 app = Flask(__name__)
 
 
-def detect():
+def detect(fname):
 		p = subprocess.Popen(['python3', 'yolov5/detect.py', '--weights',\
-			'best2.pt', '--conf', '0.1', '--source','test1.jpeg'])
+			'best2.pt', '--conf', '0.1', '--source',fname])
 		p.communicate()
 
 		return ('Saved')
@@ -37,20 +40,21 @@ def upload():
         infile = request.files['file']
         print(str(infile.filename))
         print(infile.filename.rsplit('.'))
-        if str(infile.filename).rsplit('.')[1].lower() in ['jpeg', 'jpg']:
+        if str(infile.filename).rsplit('.')[1].lower() in ['jpeg', 'jpg', 'png']:
             print('This is the file name'+infile.filename)
             im = Image.open(io.BytesIO(infile.stream.read()))
             im = im.resize([600, 600])
 
+            fname = 'test1.'+ str(infile.filename).rsplit('.')[1].lower()
 
             im_rgb = np.array(im)[:, :, [2, 1, 0]]
-            Image.fromarray(im_rgb).save('test1.jpeg')
+            Image.fromarray(im_rgb).save(fname)
             #im.save('test1.jpeg')
 
             #run the deteciton
-            t = detect()
+            t = detect(fname)
             if t=='Saved':
-                im = Image.open('inference/output/test1.jpeg')
+                im = Image.open('inference/output/'+fname)
 
             #read the results
     
@@ -90,7 +94,7 @@ def upload():
                 css_resources=css_resources,
             )
         else:
-            print("non jpeg passed")
+            print("file with non right format passed")
             html = render_template(
                     'error.html'
                     )
