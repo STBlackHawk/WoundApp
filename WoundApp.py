@@ -47,20 +47,25 @@ def upload():
 
             fname = 'test1.'+ str(infile.filename).rsplit('.')[1].lower()
 
-            im_rgb = np.array(im)[:, :, [2, 1, 0]]
-            Image.fromarray(im_rgb).save(fname)
-            #im.save('test1.jpeg')
+            # im_rgb = np.array(im)[:, :, [2, 1, 0]]
+            # Image.fromarray(im_rgb).save(fname)
+            im.save(fname)
+
 
             #run the deteciton
             t = detect(fname)
             if t=='Saved':
                 im = Image.open('inference/output/'+fname)
 
+
+            im_rgb = np.array(im)[:, :, [2, 1, 0]]
+            im_rgb = Image.fromarray(im_rgb)
+
             #read the results
     
-            H, W = im.size[0], im.size[1]
+            H, W = im_rgb.size[0], im_rgb.size[1]
             X = np.array(
-                im.getdata()).reshape(
+                im_rgb.getdata()).reshape(
                 W, H, 3).astype(np.uint8)
         
             print(X.shape)
