@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 def detect(fname):
 		p = subprocess.Popen(['python3', 'yolov5/detect.py', '--weights',\
-			'best2.pt', '--conf', '0.1', '--source',fname])
+			'best2.pt', '--conf', '0.25', '--source',fname])
 		p.communicate()
 
 		return ('Saved')
